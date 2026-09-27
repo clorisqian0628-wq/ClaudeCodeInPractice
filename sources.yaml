@@ -16,3 +16,6 @@ general:
   - name: Bloomberg Television
     type: youtube
     channel_id: UCIALMKvObZNtJ6AmdCLP7Lg
+  - name: Yahoo Finance (YouTube)
+    type: youtube
+    channel_id: UCEAZeUIeJs0IjQiqTCdVSIg

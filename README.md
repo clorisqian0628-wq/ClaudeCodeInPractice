@@ -6,9 +6,9 @@ brief for a short-term index/ETF trader. Saved as `briefs/YYYY-MM-DD.md`.
 
 Built as a Claude Code learning project: a Python script, a skill, a
 subagent, a self-correcting retry loop, and cron scheduling.
-Full product/technical spec: [PRD.md](PRD.md) ([.docx](PRD.docx)).
+Full product/technical spec: [PRD.md](PRD.md) ([.docx](PRD.docx)). Skills (Module 2): [SKILLS.md](SKILLS.md).
 
-**Example output:** [briefs/2026-09-23.md](briefs/2026-09-23.md)
+**Example output:** [briefs/2026-09-27.md](briefs/2026-09-27.md)
 
 ## How it works
 
