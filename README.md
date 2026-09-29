@@ -6,9 +6,9 @@ brief for a short-term index/ETF trader. Saved as `briefs/YYYY-MM-DD.md`.
 
 Built as a Claude Code learning project: a Python script, a skill, a
 subagent, a self-correcting retry loop, and cron scheduling.
-Full product/technical spec: [PRD.md](PRD.md) ([.docx](PRD.docx)). Skills (Module 2): [SKILLS.md](SKILLS.md).
+Full product/technical spec: [PRD.md](PRD.md) ([.docx](PRD.docx)). Skills (Module 2): [SKILLS.md](SKILLS.md). Subagents (Module 3): [SUBAGENTS.md](SUBAGENTS.md).
 
-**Example output:** [briefs/2026-09-27.md](briefs/2026-09-27.md)
+**Example output:** [briefs/2026-09-28.md](briefs/2026-09-28.md)
 
 ## How it works
 
@@ -17,7 +17,8 @@ cron (weekdays 7:00) → run_brief.sh → claude -p → morning-brief skill
    1. fetch.py        sources.yaml → data/latest.json (last 24h, deduped)
    2. retry loop      on failure: read error, retry/fix, max 3 attempts
    3. market-analyst  subagent (Read/Write only) writes the brief
-   4. check           briefs/YYYY-MM-DD.md exists and cites sources
+   4. brief-checker   subagent (Read/Grep only) fact-checks it; one revision if it fails
+   5. save            briefs/YYYY-MM-DD.md
 ```
 
 | File | Role |

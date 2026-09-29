@@ -60,18 +60,28 @@ Use the `market-analyst` subagent. Tell it: input `data/latest.json`,
 output `briefs/TODAY.md`, date TODAY, and the lookback window (e.g. "news
 since Friday's close, 72h") so it frames the brief correctly.
 
-### 3. Check
+### 3. Fact-check (max 1 revision)
 
-Read `briefs/TODAY.md` and confirm: it has "Top stories" with 3-5 stories,
-every story cites at least one source, the footer lists any missing sources,
-and it contains no buy/sell/price-target language. If something is off, ask
-the subagent to fix that one thing, once.
+Use the `brief-checker` subagent. Give it only the two paths:
+`briefs/TODAY.md` and `data/latest.json`. Don't pass along your own notes or
+the analyst's reasoning; the check is useful because it is independent.
+
+- **PASS** → done. Keep any warnings for the report.
+- **FAIL** → send the checker's issue list, unchanged, to `market-analyst`
+  and ask it to fix exactly those issues in `briefs/TODAY.md` (remove
+  unsupported facts rather than rewording them). Then run `brief-checker`
+  once more.
+- **Still FAIL after the revision** → keep the brief, but append at the end:
+  `> ⚠️ Fact-check failed: <one line per remaining issue>`
+  so the reader knows. Never loop more than once; an unbounded
+  writer↔checker loop can run forever.
 
 ## Output
 
 - `briefs/TODAY.md` (format defined in `.claude/agents/market-analyst.md`).
 - A short final report: file path, lookback hours, fetch attempts, items and
-  sources used, missing sources.
+  sources used, missing sources, and the fact-check result (first verdict,
+  whether a revision happened, final verdict, issues).
 
 ## Constraints
 
