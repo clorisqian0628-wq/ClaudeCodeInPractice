@@ -1,101 +1,136 @@
 ---
 name: morning-brief
-description: Fetch recent market news and write today's brief to briefs/YYYY-MM-DD.md, retrying failed fetches. Use when asked to run, generate, or redo the morning brief (this is also what the weekday cron job runs).
+description: Orchestrate the multi-agent morning brief. Fetch news for every category in sources.yaml, have writer and fact-checker subagents work each category in parallel, then have the editor merge them into briefs/YYYY-MM-DD.md. Use when asked to run, generate, or redo the morning brief (this is also what the weekday cron job runs).
 ---
 
-# Morning brief
+# Morning brief (orchestrator)
 
 ## Purpose
 
-Produce the same kind of brief every trading day, reliably and unattended:
-fetch the news, recover from fetch failures on its own, have the
-`market-analyst` subagent write the brief, and make sure a file always lands
-in `briefs/`, even if the run fails, so a missing brief is never a mystery.
+You are the orchestrator. You do not write or check the brief yourself; you
+coordinate specialists and handle their failures:
+
+| Agent | Role | Tools |
+|---|---|---|
+| `fetch.py` (script) | Pull news per category → `data/<category>.json` | n/a |
+| `market-analyst` (subagent, 1 per category) | Write a category section | Read, Write |
+| `brief-checker` (subagent, 1 per category + 1 final) | Fact-check against the data | Read, Grep |
+| `editor` (subagent) | Merge sections into the final brief | Read, Write |
+
+A file must always land in `briefs/TODAY.md`, even when parts fail.
 
 ## When to use
 
 - The weekday 7:00 cron job (`run_brief.sh`) runs this headless.
 - The user asks to run or redo today's brief.
 
-Not for: adding sources (use `add-news-source`), or analysing a single ticker.
+Not for: adding sources or categories (use `add-news-source`).
 
 ## Inputs
 
-- `sources.yaml`: sources for the `general` category.
-- Today's date and weekday: `date "+%F %a"` → TODAY, WEEKDAY.
-- Lookback window (HOURS):
-  - **Mon, Sat, Sun → 72.** Covers Friday's close, the weekend, and Asia/
-    Europe on Monday morning. With 24 hours a Monday brief would miss
-    Friday's session and most weekend news.
-  - **Tue–Fri → 24.**
+- `sources.yaml`: every top-level key is a CATEGORY.
+- `date "+%F %a"` → TODAY, WEEKDAY. HOURS = 72 on Mon/Sat/Sun (covers
+  Friday's close and the weekend), else 24.
+- Category settings (priority order; an unknown category gets focus "news
+  about <category> relevant to trading", budget 100, last in priority):
+
+| Category | Title | Focus | Word budget |
+|---|---|---|---|
+| general | Market | Fed and rates, macro data, trade/geopolitics, oil, mega-cap tech, index moves | 180 |
+| semis | Semis | Chip demand and supply, AI accelerators, memory, foundries, export controls: what moves SOXX/SMH | 120 |
+
+Final brief limit: sum of budgets for the categories included (max 300).
 
 ## Process
 
 Run from the project root.
 
-### 1. Fetch (retry loop, max 3 attempts)
+**Parallelism is required, not optional.** Categories are independent, so
+each stage below is ONE assistant message containing one tool call per
+category. Do not wait for one category's result before starting the
+next. With categories general and semis, your messages look like:
 
-`.venv/bin/python -W ignore fetch.py --hours HOURS`
+| Message | Tool calls in that single message |
+|---|---|
+| Fetch | `Bash` fetch general + `Bash` fetch semis |
+| Write | `Agent` market-analyst (general) + `Agent` market-analyst (semis) |
+| Check | `Agent` brief-checker (general) + `Agent` brief-checker (semis) |
+| Revise / re-check | one call per FAILED category, all in one message |
+| Merge, final check | single calls (they need all sections) |
 
-After each attempt:
+Retries of a single category (fetch attempt 2, etc.) can be single calls.
+
+### 1. Fetch: all categories in parallel, max 3 attempts each
+
+`.venv/bin/python -W ignore fetch.py --category C --hours HOURS --out data/C.json`
 
 | Result | Action |
 |---|---|
-| Exit 0 | Go to step 2. |
-| Exit 1 + `FAILED SOURCES` | Some sources failed. YouTube feeds often return 404/500 briefly, so rerun. After 3 attempts, if `data/latest.json` has items, go to step 2 anyway; failures are in its `errors` field and the brief will list them. |
-| Traceback / missing module / missing file | Environment problem. Read the error and fix it if possible, e.g. `ModuleNotFoundError` → `.venv/bin/pip install -r requirements.txt`. Then rerun. |
+| Exit 0 | Category ready. |
+| Exit 1 + `FAILED SOURCES` | Rerun that category (YouTube feeds often 404/500 briefly). After 3 attempts, use it anyway if `data/C.json` has items; failures are in its `errors`. |
+| Traceback / missing module | Fix the environment (e.g. `.venv/bin/pip install -r requirements.txt`), rerun. |
+| Still no items after 3 attempts | **Drop the category** and record the reason for the editor. |
 
-If after 3 attempts there is no usable `data/latest.json` (missing or 0
-items), write `briefs/TODAY.md`:
+If *every* category is dropped, write `briefs/TODAY.md` with
+`**Brief not generated.** Fetch failed after 3 attempts.` plus the errors, and stop.
 
-    # Morning Market Brief - TODAY
-    **Brief not generated.** Fetch failed after 3 attempts.
-    Last error: <the error>
+### 2. Write: one `market-analyst` per category, in parallel
 
-and stop.
+Give each: CATEGORY, title, FOCUS, input `data/C.json`, output
+`briefs/sections/TODAY-C.md`, WORD BUDGET, lookback ("last HOURS hours").
 
-### 2. Write
+### 3. Check: one `brief-checker` per section, in parallel
 
-Use the `market-analyst` subagent. Tell it: input `data/latest.json`,
-output `briefs/TODAY.md`, date TODAY, and the lookback window (e.g. "news
-since Friday's close, 72h") so it frames the brief correctly.
+Give each only: the section path, `data/C.json`, WORD LIMIT = budget + 20.
+Don't pass your notes or the writer's reasoning; the check is useful because
+it is independent.
 
-### 3. Fact-check (max 1 revision)
+### 4. Revise failed sections: max 1 round, in parallel
 
-Use the `brief-checker` subagent. Give it only the two paths:
-`briefs/TODAY.md` and `data/latest.json`. Don't pass along your own notes or
-the analyst's reasoning; the check is useful because it is independent.
+For each FAIL: send the checker's issue list, unchanged, to a
+`market-analyst` for that section ("fix exactly these issues in <path>"),
+then re-check with `brief-checker` (again in parallel across categories).
+Still FAIL → append to that section file:
+`> ⚠️ Fact-check failed: <one line per remaining issue>`.
+Never loop more than once.
 
-- **PASS** → done. Keep any warnings for the report.
-- **FAIL** → send the checker's issue list, unchanged, to `market-analyst`
-  and ask it to fix exactly those issues in `briefs/TODAY.md` (remove
-  unsupported facts rather than rewording them). Then run `brief-checker`
-  once more.
-- **Still FAIL after the revision** → keep the brief, but append at the end:
-  `> ⚠️ Fact-check failed: <one line per remaining issue>`
-  so the reader knows. Never loop more than once; an unbounded
-  writer↔checker loop can run forever.
+If a writer produced no file at all, retry that writer once; if it fails
+again, drop the category ("writer failed").
+
+### 5. Merge: `editor`
+
+Give it: section paths in priority order, TODAY, output `briefs/TODAY.md`,
+TOTAL WORD LIMIT, and dropped categories with reasons.
+
+If the editor fails (no file), write `briefs/TODAY.md` yourself by
+concatenating the sections under a `# Morning Market Brief - TODAY` header,
+with a note `(unedited: editor failed)`.
+
+### 6. Final check: `brief-checker` on the merged brief
+
+Give it `briefs/TODAY.md`, **all** `data/C.json` files used, WORD LIMIT =
+total limit + 20. This catches anything the editor changed.
+FAIL → one fix by the `editor` with the issue list, re-check once, then
+append the ⚠️ line if still failing.
 
 ## Output
 
-- `briefs/TODAY.md` (format defined in `.claude/agents/market-analyst.md`).
-- A short final report: file path, lookback hours, fetch attempts, items and
-  sources used, missing sources, and the fact-check result (first verdict,
-  whether a revision happened, final verdict, issues).
+- `briefs/TODAY.md`: the final brief. `briefs/sections/`: per-category sections.
+- A short final report: lookback, per category (fetch attempts, items,
+  missing sources, check verdicts and revisions), editor result (duplicates
+  removed, words cut), final check verdict.
 
 ## Constraints
 
-- Never edit `sources.yaml` or `fetch.py` to make an error go away. A
-  permanently broken source needs a human (see `add-news-source`).
-- Never delete or overwrite an existing brief for another date.
-- Re-running on the same day overwrites today's brief; that is intended.
+- Never edit `sources.yaml`, `fetch.py`, or agent files to make an error go away.
+- Never overwrite a brief or section for another date. Re-running the same day overwrites that day's files.
+- Only the subagents write brief content. You only write the fallback files described above.
 
 ## Edge cases and nuances
 
-- **Partial data is better than no brief.** One dead source should never
-  block the brief; it shows up in "Missing sources".
-- **Market holidays:** the run still happens; the brief will simply be
-  thinner. The analyst should not invent news to fill space.
-- **Late-evening manual runs:** most items are timestamped the next day in
-  UTC. The brief is still labeled with the local date; mention this in the
-  report if the run is after 18:00.
+- **Partial data beats no brief.** A dead source or category never blocks
+  the others; it appears in "Missing sources" / "Not included".
+- **Cross-category duplicates are expected** (Nvidia news is both macro and
+  semis). Writers work independently and can't know; the editor fixes it.
+- **Market holidays:** thinner brief is fine; nobody should fill space.
+- **Late-evening runs:** the brief keeps the local date; mention it in the report if after 18:00.

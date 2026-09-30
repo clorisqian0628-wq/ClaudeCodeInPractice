@@ -19,3 +19,13 @@ general:
   - name: Yahoo Finance (YouTube)
     type: youtube
     channel_id: UCEAZeUIeJs0IjQiqTCdVSIg
+semis:
+  - name: EE Times
+    type: rss
+    url: https://www.eetimes.com/feed/
+  - name: Semiconductor Engineering
+    type: rss
+    url: https://semiengineering.com/feed/
+  - name: SemiAnalysis
+    type: rss
+    url: https://newsletter.semianalysis.com/feed

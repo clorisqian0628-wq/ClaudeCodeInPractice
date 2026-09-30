@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1520" height="1170" viewBox="0 0 1520 1170" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="h" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1e1e1e"/></marker><marker id="hr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e03131"/></marker></defs>
+<rect width="1520" height="1170" fill="#ffffff"/>
+<rect x="40" y="100" width="220" height="70" rx="10" fill="#e9ecef" stroke="#1e1e1e" stroke-width="2" />
+<text x="150.0" y="130.875" font-size="15" text-anchor="middle" font-weight="bold">cron (weekdays 7:00)</text>
+<text x="150.0" y="149.625" font-size="15" text-anchor="middle" font-weight="normal">run_brief.sh</text>
+<rect x="320" y="100" width="300" height="70" rx="10" fill="#e9ecef" stroke="#1e1e1e" stroke-width="2" />
+<text x="470.0" y="130.875" font-size="15" text-anchor="middle" font-weight="bold">claude -p (headless)</text>
+<text x="470.0" y="149.625" font-size="15" text-anchor="middle" font-weight="normal">--allowedTools allow-list</text>
+<rect x="200" y="220" width="760" height="80" rx="10" fill="#a5d8ff" stroke="#1e1e1e" stroke-width="2" />
+<text x="580.0" y="255.875" font-size="15" text-anchor="middle" font-weight="bold">ORCHESTRATOR: morning-brief skill (main agent)</text>
+<text x="580.0" y="274.625" font-size="15" text-anchor="middle" font-weight="normal">plans stages, launches workers in parallel, handles failures</text>
+<rect x="40" y="340" width="1080" height="440" rx="10" fill="none" stroke="#1971c2" stroke-width="2" stroke-dasharray="8 6"/>
+<rect x="80" y="390" width="400" height="70" rx="10" fill="#b2f2bb" stroke="#1e1e1e" stroke-width="2" />
+<text x="280.0" y="420.875" font-size="15" text-anchor="middle" font-weight="bold">fetch.py --category general</text>
+<text x="280.0" y="439.625" font-size="15" text-anchor="middle" font-weight="normal">-&gt; data/general.json  (~110 items / 6 sources)</text>
+<rect x="80" y="510" width="400" height="70" rx="10" fill="#ffec99" stroke="#1e1e1e" stroke-width="2" />
+<text x="280.0" y="540.875" font-size="15" text-anchor="middle" font-weight="bold">market-analyst (general)</text>
+<text x="280.0" y="559.625" font-size="15" text-anchor="middle" font-weight="normal">writes section | Read, Write</text>
+<rect x="80" y="630" width="400" height="70" rx="10" fill="#d0bfff" stroke="#1e1e1e" stroke-width="2" />
+<text x="280.0" y="660.875" font-size="15" text-anchor="middle" font-weight="bold">brief-checker (general)</text>
+<text x="280.0" y="679.625" font-size="15" text-anchor="middle" font-weight="normal">fact-checks vs data/general.json | Read, Grep</text>
+<rect x="600" y="390" width="400" height="70" rx="10" fill="#b2f2bb" stroke="#1e1e1e" stroke-width="2" />
+<text x="800.0" y="420.875" font-size="15" text-anchor="middle" font-weight="bold">fetch.py --category semis</text>
+<text x="800.0" y="439.625" font-size="15" text-anchor="middle" font-weight="normal">-&gt; data/semis.json  (~8 items / 3 sources)</text>
+<rect x="600" y="510" width="400" height="70" rx="10" fill="#ffec99" stroke="#1e1e1e" stroke-width="2" />
+<text x="800.0" y="540.875" font-size="15" text-anchor="middle" font-weight="bold">market-analyst (semis)</text>
+<text x="800.0" y="559.625" font-size="15" text-anchor="middle" font-weight="normal">writes section | Read, Write</text>
+<rect x="600" y="630" width="400" height="70" rx="10" fill="#d0bfff" stroke="#1e1e1e" stroke-width="2" />
+<text x="800.0" y="660.875" font-size="15" text-anchor="middle" font-weight="bold">brief-checker (semis)</text>
+<text x="800.0" y="679.625" font-size="15" text-anchor="middle" font-weight="normal">fact-checks vs data/semis.json | Read, Grep</text>
+<rect x="310" y="830" width="540" height="80" rx="10" fill="#ffec99" stroke="#1e1e1e" stroke-width="2" />
+<text x="580.0" y="865.875" font-size="15" text-anchor="middle" font-weight="bold">editor</text>
+<text x="580.0" y="884.625" font-size="15" text-anchor="middle" font-weight="normal">merges sections, removes duplicates, cuts to 300 words | Read, Write</text>
+<rect x="310" y="960" width="540" height="70" rx="10" fill="#d0bfff" stroke="#1e1e1e" stroke-width="2" />
+<text x="580.0" y="990.875" font-size="15" text-anchor="middle" font-weight="bold">brief-checker (final)</text>
+<text x="580.0" y="1009.625" font-size="15" text-anchor="middle" font-weight="normal">vs ALL data/*.json: catches editor changes</text>
+<rect x="380" y="1080" width="400" height="60" rx="10" fill="#a5d8ff" stroke="#1e1e1e" stroke-width="2" />
+<text x="580.0" y="1105.875" font-size="15" text-anchor="middle" font-weight="bold">briefs/YYYY-MM-DD.md</text>
+<text x="580.0" y="1124.625" font-size="15" text-anchor="middle" font-weight="normal">(+ briefs/sections/*)</text>
+<rect x="1180" y="390" width="300" height="70" rx="10" fill="#b2f2bb" stroke="#1e1e1e" stroke-width="2" />
+<text x="1330.0" y="420.875" font-size="15" text-anchor="middle" font-weight="bold">sources.yaml</text>
+<text x="1330.0" y="439.625" font-size="15" text-anchor="middle" font-weight="normal">categories = top-level keys</text>
+<rect x="1180" y="230" width="300" height="70" rx="10" fill="#a5d8ff" stroke="#1e1e1e" stroke-width="2" />
+<text x="1330.0" y="260.875" font-size="15" text-anchor="middle" font-weight="bold">add-news-source skill</text>
+<text x="1330.0" y="279.625" font-size="15" text-anchor="middle" font-weight="normal">(human-triggered, + check_feed.py)</text>
+<rect x="1180" y="540" width="300" height="440" rx="10" fill="#ffc9c9" stroke="#1e1e1e" stroke-width="2" />
+<text x="1196" y="607.4" font-size="14" text-anchor="start" font-weight="bold">FAILURE HANDLING</text>
+<text x="1196" y="624.9" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="642.4" font-size="14" text-anchor="start" font-weight="normal">Source fails: retry fetch x3,</text>
+<text x="1196" y="659.9" font-size="14" text-anchor="start" font-weight="normal">then continue + list as missing</text>
+<text x="1196" y="677.4" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="694.9" font-size="14" text-anchor="start" font-weight="normal">Category has 0 items: drop it,</text>
+<text x="1196" y="712.4" font-size="14" text-anchor="start" font-weight="normal">'Not included' in footer</text>
+<text x="1196" y="729.9" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="747.4" font-size="14" text-anchor="start" font-weight="normal">Check still FAILs after revision:</text>
+<text x="1196" y="764.9" font-size="14" text-anchor="start" font-weight="normal">keep section + warning line</text>
+<text x="1196" y="782.4" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="799.9" font-size="14" text-anchor="start" font-weight="normal">Writer wrote no file: retry once,</text>
+<text x="1196" y="817.4" font-size="14" text-anchor="start" font-weight="normal">then drop category</text>
+<text x="1196" y="834.9" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="852.4" font-size="14" text-anchor="start" font-weight="normal">Editor fails: orchestrator</text>
+<text x="1196" y="869.9" font-size="14" text-anchor="start" font-weight="normal">concatenates sections</text>
+<text x="1196" y="887.4" font-size="14" text-anchor="start" font-weight="normal"></text>
+<text x="1196" y="904.9" font-size="14" text-anchor="start" font-weight="normal">All categories fail: write</text>
+<text x="1196" y="922.4" font-size="14" text-anchor="start" font-weight="normal">'Brief not generated' + errors</text>
+<polyline points="260,135.0 320,135.0" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="470.0,170 470.0,220" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="280.0,460 280.0,510" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="288.0" y="489.0" font-size="13" fill="#1e1e1e">JSON path, focus, budget</text>
+<polyline points="280.0,580 280.0,630" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="288.0" y="609.0" font-size="13" fill="#1e1e1e">section path + JSON path only</text>
+<polyline points="480,665.0 510,665.0 510,545.0 480,545.0" fill="none" stroke="#e03131" stroke-width="2" marker-end="url(#hr)" stroke-dasharray="6 5"/>
+<text x="526" y="601.0" font-size="13" fill="#e03131">FAIL: issues</text>
+<text x="526" y="617.0" font-size="13" fill="#e03131">(max 1 revision)</text>
+<polyline points="380.0,300 280.0,390" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="800.0,460 800.0,510" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="808.0" y="489.0" font-size="13" fill="#1e1e1e">JSON path, focus, budget</text>
+<polyline points="800.0,580 800.0,630" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="808.0" y="609.0" font-size="13" fill="#1e1e1e">section path + JSON path only</text>
+<polyline points="1000,665.0 1030,665.0 1030,545.0 1000,545.0" fill="none" stroke="#e03131" stroke-width="2" marker-end="url(#hr)" stroke-dasharray="6 5"/>
+<text x="1046" y="601.0" font-size="13" fill="#e03131">FAIL: issues</text>
+<text x="1046" y="617.0" font-size="13" fill="#e03131">(max 1 revision)</text>
+<polyline points="780.0,300 800.0,390" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="280.0,700 460.0,830" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="378.0" y="769.0" font-size="13" fill="#1e1e1e">PASS section</text>
+<polyline points="800.0,700 700.0,830" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="758.0" y="769.0" font-size="13" fill="#1e1e1e">PASS section</text>
+<polyline points="580.0,910 580.0,960" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="850,995.0 890,995.0 890,870.0 850,870.0" fill="none" stroke="#e03131" stroke-width="2" marker-end="url(#hr)" stroke-dasharray="6 5"/>
+<text x="906" y="936.5" font-size="13" fill="#e03131">FAIL: 1 fix</text>
+<polyline points="580.0,1030 580.0,1080" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<polyline points="1330.0,300 1330.0,390" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="1338.0" y="349.0" font-size="13" fill="#1e1e1e">verified entries</text>
+<polyline points="1180,425.0 1120,425.0" fill="none" stroke="#1e1e1e" stroke-width="2" marker-end="url(#h)" />
+<text x="40" y="38" font-size="28" fill="#1e1e1e" font-weight="bold">Morning Market Brief: multi-agent architecture</text>
+<text x="40" y="66" font-size="16" fill="#495057" font-weight="normal">Orchestrator-worker + parallel fan-out per category + sequential merge</text>
+<text x="60" y="366" font-size="16" fill="#1971c2" font-weight="normal">PARALLEL: one lane per category in sources.yaml (issued in the same message)</text>
+<text x="1180" y="479" font-size="13" fill="#495057" font-weight="normal">&lt;- read by fetch.py</text>
+</svg>
